@@ -46,22 +46,24 @@ class _OrderItemState extends State<OrderItem> {
             height: min(widget.order.products.length * 20.0 + 15.0, 140),
             child: ListView(
                 children: widget.order.products
-                    .map((prod) => Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              prod.title,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              '${prod.quantity}x \$${prod.price}',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.grey),
-                            )
-                          ],
+                    .map((prod) => Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                prod.title,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                '${prod.quantity}x \$${prod.price}',
+                                style:
+                                    TextStyle(fontSize: 18, color: Colors.grey),
+                              )
+                            ],
+                          ),
                         ))
                     .toList()),
           )
