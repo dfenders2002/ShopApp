@@ -44,7 +44,7 @@ class CartScreen extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Chip(
                         label: Text(
-                          '\$${cart.totalAmount.ceilToDouble()}',
+                          '\$${cart.totalAmount.toStringAsFixed(2)}',
                         ),
                         backgroundColor: Colors.black87,
                       ),
