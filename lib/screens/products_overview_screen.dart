@@ -4,10 +4,8 @@ import 'package:flutter_complete_guide/widgets/app_drawer.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/products_grid.dart';
-import '../providers/products.dart';
 import '../widgets/badge.dart';
 import '../providers/cart.dart';
-import '../screens/cart_screen.dart';
 
 enum Filters { Favorites, all }
 

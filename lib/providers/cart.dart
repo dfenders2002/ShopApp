@@ -1,7 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class CartItem {
   final String id;
@@ -63,6 +60,24 @@ class Cart with ChangeNotifier {
 
   void removeItem(String productId) {
     _items.remove(productId);
+    notifyListeners();
+  }
+
+  void removeSingleItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      return;
+    }
+    if (_items[productId].quantity > 1) {
+      _items.update(
+          productId,
+          (itm) => CartItem(
+              id: itm.id,
+              title: itm.title,
+              quantity: itm.quantity - 1,
+              price: itm.price));
+    } else {
+      _items.remove(productId);
+    }
     notifyListeners();
   }
 
