@@ -56,7 +56,7 @@ class ProductItem extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
                 ),
-                duration: Duration(seconds: 2),
+                duration: Duration(seconds: 1),
                 action: SnackBarAction(
                   label: 'Undo',
                   onPressed: () {
