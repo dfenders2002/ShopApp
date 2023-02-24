@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../providers/products.dart';
 import '../widgets/user_product_item.dart';
 import '../widgets/app_drawer.dart';
+import '../screens/edit_product_screen.dart';
 
 class UserProductsScreen extends StatelessWidget {
   static const routeName = '/user-products';
@@ -16,8 +17,14 @@ class UserProductsScreen extends StatelessWidget {
     final producsData = Provider.of<Products>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your producs'),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.add))],
+        title: const Text('Your products'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(EditProductScreen.routeName);
+              },
+              icon: const Icon(Icons.add))
+        ],
       ),
       drawer: AppDrawer(),
       body: Padding(
