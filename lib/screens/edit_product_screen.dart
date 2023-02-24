@@ -11,6 +11,16 @@ class EditProductScreen extends StatefulWidget {
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
+  final _focusPrice = FocusNode();
+  final _focusDescription = FocusNode();
+
+  //dispose focusnodes otherwise memory leak
+  void dispose() {
+    _focusPrice.dispose();
+    _focusDescription.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,10 +33,24 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: ListView(
             children: [
               TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Title',
-                ),
+                decoration: InputDecoration(labelText: 'Title'),
                 textInputAction: TextInputAction.next,
+                onFieldSubmitted: (val) =>
+                    FocusScope.of(context).requestFocus(_focusPrice),
+              ),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Price'),
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.number,
+                focusNode: _focusPrice,
+                onFieldSubmitted: (val) =>
+                    FocusScope.of(context).requestFocus(_focusDescription),
+              ),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Description'),
+                maxLines: 3,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.multiline,
               ),
             ],
           ),
