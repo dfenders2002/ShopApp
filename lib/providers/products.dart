@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'product.dart';
 
@@ -64,16 +66,32 @@ class Products with ChangeNotifier {
     return _items.firstWhere((elm) => elm.id == Id);
   }
 
-  void addProduct(Product prod) {
-    final newProduct = Product(
+  Future<void> addProduct(Product prod) {
+    final url = Uri.parse(
+        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+    return http
+        .post(
+      url,
+      body: json.encode({
+        'title': prod.title,
+        'description': prod.description,
+        'imageUrl': prod.imageUrl,
+        'price': prod.price,
+        'isFavorite': prod.isFavorite,
+      }),
+    )
+        .then((response) {
+      final newProduct = Product(
         title: prod.title,
         description: prod.description,
         imageUrl: prod.imageUrl,
         price: prod.price,
-        id: DateTime.now().toString());
-    _items.add(newProduct);
-    //_items.insert(0, newProduct); begin of list
-    notifyListeners();
+        id: json.decode(response.body)['name'],
+      );
+      _items.add(newProduct);
+      //_items.insert(0, newProduct); begin of list
+      notifyListeners();
+    });
   }
 
   void updateProduct(String id, Product newProd) {
