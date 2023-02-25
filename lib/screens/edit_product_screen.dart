@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/product.dart';
+import '../providers/products.dart';
 
 class EditProductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
@@ -35,7 +37,44 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _safeForm() {
+    final isValid = _form.currentState.validate(); //triggerd alle validates
+    if (!isValid) {
+      return;
+    }
     _form.currentState.save();
+    Provider.of<Products>(context, listen: false).addProduct(_newProd);
+    Navigator.of(context).pop();
+  }
+
+  var initVals = {
+    'title': '',
+    'description': '',
+    'price': '',
+    'imageUrl': '',
+  };
+
+  var isInit = true;
+
+  @override
+  void didChangeDependencies() {
+    if (isInit) {
+      final prodId = ModalRoute.of(context).settings.arguments as String;
+      if (prodId != null) {
+        _newProd =
+            Provider.of<Products>(context, listen: false).findById(prodId);
+        initVals = {
+          'title': _newProd.title,
+          'description': _newProd.description,
+          'price': _newProd.price.toString(),
+          //'imageUrl': _newProd.imageUrl,
+          'imageUrl': ''
+        };
+        _imageUrlController.text = _newProd.imageUrl;
+      }
+    }
+    isInit = false;
+    super.didChangeDependencies();
+    // TODO: implement didChangeDependencies
   }
 
   @override
@@ -46,7 +85,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         actions: [
           IconButton(
               onPressed: () {
-                _safeForm;
+                _safeForm();
               },
               icon: Icon(Icons.save))
         ],
@@ -58,10 +97,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: ListView(
             children: [
               TextFormField(
+                initialValue: initVals['title'],
                 decoration: InputDecoration(labelText: 'Title'),
                 textInputAction: TextInputAction.next,
                 onFieldSubmitted: (val) {
                   FocusScope.of(context).requestFocus(_focusPrice);
+                },
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'please provide a title;';
+                  }
+                  return null;
                 },
                 onSaved: (val) {
                   _newProd = Product(
@@ -74,12 +120,25 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                initialValue: initVals['price'],
                 decoration: InputDecoration(labelText: 'Price'),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.number,
                 focusNode: _focusPrice,
                 onFieldSubmitted: (val) {
                   FocusScope.of(context).requestFocus(_focusDescription);
+                },
+                validator: (val) {
+                  if (val.isEmpty) {
+                    return 'please enter number';
+                  }
+                  if (double.tryParse(val) == null) {
+                    return 'enter valid number';
+                  }
+                  if (double.parse(val) <= 0) {
+                    return 'number higher then 0';
+                  }
+                  return null;
                 },
                 onSaved: (val) {
                   _newProd = Product(
@@ -92,11 +151,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                initialValue: initVals['description'],
                 decoration: InputDecoration(labelText: 'Description'),
                 maxLines: 3,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.multiline,
                 focusNode: _focusDescription,
+                validator: (val) {
+                  if (val.isEmpty) {
+                    return 'enter description';
+                  }
+                  return null;
+                },
                 onSaved: (val) {
                   _newProd = Product(
                     id: _newProd.id,
@@ -128,6 +194,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                   Expanded(
                     child: TextFormField(
+                      //cant set controller to init value
                       decoration: InputDecoration(labelText: 'Image URL'),
                       keyboardType: TextInputType.url,
                       textInputAction: TextInputAction.done,
@@ -145,6 +212,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           imageUrl: _newProd.imageUrl, //val
                         );
                       },
+                      //validator: (val) {
+                      //  if (val.isEmpty) {
+                      //    return 'please enter an URL';
+                      //  }
+                      //  if (!val.startsWith('http') &&
+                      //      !val.startsWith('https')) {
+                      //    return 'enter valid URL';
+                      //  }
+                      //  if (!val.endsWith('.png') &&
+                      //      !val.endsWith('.jpg') &&
+                      //      !val.endsWith('.jpeg')) {
+                      //    return 'use png or jpg';
+                      //  }
+                      //  return null;
+                      //},
                     ),
                   ),
                 ],
