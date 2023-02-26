@@ -91,6 +91,8 @@ class Products with ChangeNotifier {
       _items.add(newProduct);
       //_items.insert(0, newProduct); begin of list
       notifyListeners();
+    }).catchError((err) {
+      throw err;
     });
   }
 
