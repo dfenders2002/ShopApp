@@ -36,7 +36,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     super.dispose();
   }
 
-  void _safeForm() {
+  Future<void> _safeForm() async {
     final isValid = _form.currentState.validate(); //triggerd alle validates
     if (!isValid) {
       return;
@@ -49,26 +49,31 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Provider.of<Products>(context, listen: false)
           .updateProduct(_newProd.id, _newProd);
     } else {
-      Provider.of<Products>(context, listen: false)
-          .addProduct(_newProd)
-          .catchError((err) {
-        return showDialog<Null>(
-            context: context,
-            builder: (ctx) => AlertDialog(
-                  title: Text('error occured!'),
-                  content: Text('Something went wrong'),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: Text('Okay'))
-                  ],
-                ));
-      }).then((_) {
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_newProd);
+      } catch (error) {
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('An error occurred!'),
+            content: Text('Something went wrong.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+              )
+            ],
+          ),
+        );
+      } finally {
         setState(() {
           isLoading = false;
         });
         Navigator.of(context).pop();
-      });
+      }
     }
   }
 
