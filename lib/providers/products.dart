@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -138,8 +140,19 @@ class Products with ChangeNotifier {
     }
   }
 
-  void deleteProd(String id) {
-    _items.removeWhere((elm) => elm.id == id);
+  Future<void> deleteProd(String id) async {
+    final url = Uri.parse(
+        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+    final existingProdIndex = _items.indexWhere((prod) => prod.id == id);
+    var existingProd = _items[existingProdIndex];
+    _items.remove(existingProd);
     notifyListeners();
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      _items.insert(existingProdIndex, existingProd);
+      notifyListeners(); //voor geval dat verwijderen fout gaat optimistic updating
+      throw HttpException('Could not delete product.');
+    }
+    existingProd = null;
   }
 }
