@@ -54,7 +54,8 @@ class Products with ChangeNotifier {
   //}
 
   final String authToken;
-  Products(this.authToken, this._items);
+  final String userId;
+  Products(this.authToken, this.userId, this._items);
 
   List<Product> get faveItems {
     return _items.where((element) => element.isFavorite).toList();
@@ -73,10 +74,18 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     final url = Uri.parse(
-        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken');
+        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken&orderBy="creatorId"&equalTo="$userId"');
     try {
       final response = await http.get(url);
       final data = json.decode(response.body) as Map<String, dynamic>;
+      if (data == null) {
+        return;
+      }
+
+      final favoriteUrl = Uri.parse(
+          'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/userFavorites/$userId.json?auth=$authToken');
+      final favoriteResponse = await http.get(favoriteUrl);
+      final favoriteData = json.decode(favoriteResponse.body);
       final List<Product> loadedProds = [];
       data.forEach((prodId, prodVal) {
         loadedProds.add(Product(
@@ -84,7 +93,8 @@ class Products with ChangeNotifier {
           title: prodVal['title'],
           description: prodVal['description'],
           price: prodVal['price'],
-          isFavorite: prodVal['isFavorite'],
+          isFavorite:
+              favoriteData == null ? false : favoriteData[prodId] ?? false,
           imageUrl: prodVal['imageUrl'],
         ));
       });
@@ -107,7 +117,7 @@ class Products with ChangeNotifier {
           'description': prod.description,
           'imageUrl': prod.imageUrl,
           'price': prod.price,
-          'isFavorite': prod.isFavorite,
+          'creatorId': userId,
         }),
       );
       final newProduct = Product(
