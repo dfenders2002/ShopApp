@@ -53,6 +53,9 @@ class Products with ChangeNotifier {
   //  notifyListeners();
   //}
 
+  final String authToken;
+  Products(this.authToken, this._items);
+
   List<Product> get faveItems {
     return _items.where((element) => element.isFavorite).toList();
   }
@@ -70,7 +73,7 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     final url = Uri.parse(
-        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken');
     try {
       final response = await http.get(url);
       final data = json.decode(response.body) as Map<String, dynamic>;
@@ -94,7 +97,7 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product prod) async {
     final url = Uri.parse(
-        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken');
 
     try {
       final response = await http.post(
@@ -126,7 +129,7 @@ class Products with ChangeNotifier {
     final index = _items.indexWhere((elm) => elm.id == id);
     if (index >= 0) {
       final url = Uri.parse(
-          'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+          'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$authToken');
       await http.patch(url,
           body: json.encode({
             'title': newProd.title,
@@ -142,7 +145,7 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProd(String id) async {
     final url = Uri.parse(
-        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+        'https://flutter-test-fc38f-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$authToken');
     final existingProdIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProd = _items[existingProdIndex];
     _items.remove(existingProd);
