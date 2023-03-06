@@ -22,7 +22,7 @@ class _OrderItemState extends State<OrderItem> {
     return AnimatedContainer(
       duration: Duration(milliseconds: 200),
       height:
-          _expanded ? min(widget.order.products.length * 20.0 + 110, 200) : 95,
+          _expanded ? min(widget.order.products.length * 21.0 + 110, 200) : 95,
       child: Card(
         margin: EdgeInsets.all(10),
         child: Column(children: [
